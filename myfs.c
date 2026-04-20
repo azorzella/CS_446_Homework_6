@@ -103,6 +103,7 @@ int main(int argc, char *argv[]){
   cur_dir_inode_number = 3;  
   my_creatdir(myfs, cur_dir_inode_number, "mydata");  // will be inode 7
 
+  // Don't forget to uncomment this:
   // printf("\nDumping filesystem structure:\n");
   // my_dumpfs(myfs);
 
@@ -368,5 +369,17 @@ Your function should:
 
 // IMPLEMENT THIS FUNCTION
 void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname) {
+  block_t *imap = malloc(sizeof(block_t));
+  memcpy(imap, &(myfs->imap), sizeof(block_t));
 
+  for(uint bit = 0; bit < BLKSIZE; bit++) {
+    if(imap->data[bit] == 0) {
+      printf("Found first unused bit at %d\n", bit);
+      imap->data[bit] = 1;
+      memcpy(&myfs->imap, imap, sizeof(block_t));
+      break;
+    }
+  }
+
+  free(imap);
 }
