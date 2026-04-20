@@ -324,50 +324,50 @@ created one
 
 Your function should:  
 1)  Access the inode Bitmap of the Filesystem and search to find the first location that can be 
-used for the new inode you will create (look above about how to access a specific bit inside a 
-Bitmap array). Then set that bit to indicate this inode is now used, and update the 
-Filesystem.  
-CAUTION: You are not allowed to directly access information on the Filesystem, such as: 
-myfs->imap.data[...]. You have to use the Read-Modify-Write paradigm as an actual 
-Filesystem-implementing code would do, i.e. you have to: 
-i) malloc space in Memory to read-in from Disk (you have to malloc 1 Block) to read 1 
-Block from Disk. 
-ii) read-in from Disk (use memcpy to simulate this using Virtual Memory, i.e. copy from 
-myfs->imap to the space you malloc’ed in step i).  
-iii) work on the data in Memory, i.e. find the first unused (0) bit, and set it as used (1). 
-iv) write-out to Disk (use memcpy to simulate this using Virtual Memory, i.e. copy from the 
-space you malloc’ed in step i) to the myfs->imap).  
+    used for the new inode you will create (look above about how to access a specific bit inside a 
+    Bitmap array). Then set that bit to indicate this inode is now used, and update the 
+    Filesystem.  
+    CAUTION: You are not allowed to directly access information on the Filesystem, such as: 
+    myfs->imap.data[...]. You have to use the Read-Modify-Write paradigm as an actual 
+    Filesystem-implementing code would do, i.e. you have to: 
+        i) malloc space in Memory to read-in from Disk (you have to malloc 1 Block) to read 1 
+            Block from Disk. 
+        ii) read-in from Disk (use memcpy to simulate this using Virtual Memory, i.e. copy from 
+            myfs->imap to the space you malloc’ed in step i).  
+        iii) work on the data in Memory, i.e. find the first unused (0) bit, and set it as used (1). 
+        iv) write-out to Disk (use memcpy to simulate this using Virtual Memory, i.e. copy from the 
+            space you malloc’ed in step i) to the myfs->imap).  
 2)  Use Read-Modify-Write again. Access the Block Bitmap of the Filesystem and search to find 
-the first location that can be used as a Data Block to store the data of the new inode you are 
-creating. Then set that bit to indicate this Data Block is now used, and update the Filesystem.   
+    the first location that can be used as a Data Block to store the data of the new inode you are 
+    creating. Then set that bit to indicate this Data Block is now used, and update the Filesystem.   
 3)  Use Read-Modify-Write again. Access the inode Table of the Filesystem and load the Parent 
-Directory inode, and the new Directory inode. 
-Modify the Parent Directory inode’s size to indicate that it will now have 1 more Directory 
-Entry. 
-Initialize the new Directory inode (size, blocks, data). Use the previously provided code 
-that initialized the Root Directory inode about how to achieve that. Note: Your new 
-Directory is expected to hold 2 Directory Entries at initialization, for ‘.’ and ‘..’. 
-Then finally update the inode Table on the Filesystem.  
+    Directory inode, and the new Directory inode. 
+    Modify the Parent Directory inode’s size to indicate that it will now have 1 more Directory 
+    Entry. 
+    Initialize the new Directory inode (size, blocks, data). Use the previously provided code 
+    that initialized the Root Directory inode about how to achieve that. Note: Your new 
+    Directory is expected to hold 2 Directory Entries at initialization, for ‘.’ and ‘..’. 
+    Then finally update the inode Table on the Filesystem.  
 4)  Use Read-Modify-Write again. Access the Parent Directory’s data from the Filesystem. As 
-mentioned, the data will be inside the Data Block location pointed to by the 
-inode.data[0] since this example uses no more that 1 Block. 
-Modify the Parent Directory’s data to append the new Directory Entry you are creating. 
-Follow the example above that does indexing (&dir[0], &dir[1]) after reinterpreting 
-(Pointer-casting) the Block memory to a direntry_t Pointer (i.e. to access the Memory 
-like it has the layout of a direntry_t array). Your code has to be generic, i.e. has to be able 
-to find out how many Directory Entries were in there before, and modify the next one. 
-The new Directory Entry’s inode will be the inode number that you are currently creating, 
-and the name will be the one passed to the function. You are allowed to use strlen() for 
-the name_len. 
-Then finally update the Parent Directory’s data on the Filesystem.   
+    mentioned, the data will be inside the Data Block location pointed to by the 
+    inode.data[0] since this example uses no more that 1 Block. 
+    Modify the Parent Directory’s data to append the new Directory Entry you are creating. 
+    Follow the example above that does indexing (&dir[0], &dir[1]) after reinterpreting 
+    (Pointer-casting) the Block memory to a direntry_t Pointer (i.e. to access the Memory 
+    like it has the layout of a direntry_t array). Your code has to be generic, i.e. has to be able 
+    to find out how many Directory Entries were in there before, and modify the next one. 
+    The new Directory Entry’s inode will be the inode number that you are currently creating, 
+    and the name will be the one passed to the function. You are allowed to use strlen() for 
+    the name_len. 
+    Then finally update the Parent Directory’s data on the Filesystem.   
 5)  Use Read-Modify-Write again. Access the new Directory’s data from the Filesystem (the 
-Data Block location you mapped to the new inode’s inode.data[0]in step 4). Load it 
-into Memory and modify it to include 2 Directory Entries for ‘.’ and ‘..’. The example 
-provided above for the Root Filesystem does that exactly. 
-Finally update the new Directory’s Data Block on the Filesystem.
+    Data Block location you mapped to the new inode’s inode.data[0]in step 4). Load it 
+    into Memory and modify it to include 2 Directory Entries for ‘.’ and ‘..’. The example 
+    provided above for the Root Filesystem does that exactly. 
+    Finally update the new Directory’s Data Block on the Filesystem.
 */
 
 // IMPLEMENT THIS FUNCTION
 void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname) {
-  
+
 }
