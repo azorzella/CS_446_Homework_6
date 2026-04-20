@@ -1,0 +1,5 @@
+
+Crawling filesystem structure:
+/
+|_ .
+|_ ..

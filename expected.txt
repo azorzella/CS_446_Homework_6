@@ -1,0 +1,20 @@
+
+Crawling filesystem structure: 
+/ 
+|_ . 
+|_ .. 
+|_ mystuff 
+  |___ . 
+  |___ .. 
+  |___ mydata 
+    |_____ . 
+    |_____ .. 
+|_ homework 
+  |___ . 
+  |___ .. 
+  |___ assignment5 
+    |_____ . 
+    |_____ .. 
+    |_____ mycode 
+      |_______ . 
+      |_______ ..

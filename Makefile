@@ -16,3 +16,9 @@ run:
 	make fromscratch
 	clear
 	./myfs
+
+test:
+	make fromscratch
+	clear
+	./myfs > actual.txt
+	./test.sh

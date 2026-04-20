@@ -103,8 +103,8 @@ int main(int argc, char *argv[]){
   cur_dir_inode_number = 3;  
   my_creatdir(myfs, cur_dir_inode_number, "mydata");  // will be inode 7
 
-  printf("\nDumping filesystem structure:\n");
-  my_dumpfs(myfs);
+  // printf("\nDumping filesystem structure:\n");
+  // my_dumpfs(myfs);
 
   printf("\nCrawling filesystem structure:\n");
   my_crawlfs(myfs);
@@ -114,7 +114,6 @@ int main(int argc, char *argv[]){
   
   return 0;
 }
-
 
 myfs_t* my_mkfs(int size, int maxfiles) {
   int num_data_blocks = roundup(size, BLKSIZE);
@@ -326,12 +325,12 @@ Your function should:
 1)  Access the inode Bitmap of the Filesystem and search to find the first location that can be 
     used for the new inode you will create (look above about how to access a specific bit inside a 
     Bitmap array). Then set that bit to indicate this inode is now used, and update the 
-    Filesystem.  
+    Filesystem.
     CAUTION: You are not allowed to directly access information on the Filesystem, such as: 
     myfs->imap.data[...]. You have to use the Read-Modify-Write paradigm as an actual 
-    Filesystem-implementing code would do, i.e. you have to: 
+    Filesystem-implementing code would do, i.e. you have to:
         i) malloc space in Memory to read-in from Disk (you have to malloc 1 Block) to read 1 
-            Block from Disk. 
+            Block from Disk.
         ii) read-in from Disk (use memcpy to simulate this using Virtual Memory, i.e. copy from 
             myfs->imap to the space you malloc’ed in step i).  
         iii) work on the data in Memory, i.e. find the first unused (0) bit, and set it as used (1). 
