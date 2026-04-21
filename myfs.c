@@ -446,7 +446,57 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
 
   inode_t* parent_inode = malloc(sizeof(inode_t));
   memcpy(parent_inode, &myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], sizeof(inode_t));
-  inode_t* new_dir_inode = malloc(sizeof(inode_t));
+  // inode_t* new_dir_inode = malloc(sizeof(inode_t));
   
   parent_inode->blocks++;
+
+
+
+  // Copied from above
+
+  // inode
+  void *inodetable_ptr = calloc(BLKSIZE, sizeof(char));
+  // read-in (not required, we are creating filesystem for first time, also zeroed because using calloc)
+  inode_t* inodetable = (inode_t*)inodetable_ptr;
+  inodetable[root_inode_number].size = 2 * sizeof(dirent_t);  // will contain 2 direntries ('.' and '..') at initialization
+  inodetable[root_inode_number].blocks = 1;  // will only take up 1 block (for just 2 direntries: '.' and '..') at initialization 
+  for (uint i=1; i<15; ++i)  // initialize all data blocks to NULL (1 data block only needed at initialization)
+    inodetable[root_inode_number].data[i] = NULL;
+  inodetable[root_inode_number].data[0] = &(myfs->groupdescriptor.groupdescriptor_info.block_data[root_datablock_number]);    // Changed this line to ref myfs
+  // write out to fs
+  memcpy((void*)myfs->groupdescriptor.groupdescriptor_info.inode_table, inodetable_ptr, BLKSIZE);                             // As well as this line
+
+  // data (dir)
+  void *dir_ptr = calloc(BLKSIZE, sizeof(char));
+  // read-in (not required, we are creating filesystem for first time, also zeroed because using calloc)
+  dirent_t* dir = (dirent_t*)dir_ptr;
+  // dirent '.'
+  dirent_t* root_dirent_self = &dir[0];
+  {
+  root_dirent_self->name_len = 1;
+  root_dirent_self->inode = root_inode_number;
+  root_dirent_self->file_type = 2;
+  strcpy(root_dirent_self->name, ".");
+  }
+  // dirent '..'
+  dirent_t* root_dirent_parent = &dir[1];
+  {
+  root_dirent_parent->name_len = 2;
+  root_dirent_parent->inode = root_inode_number;
+  root_dirent_parent->file_type = 2;
+  strcpy(root_dirent_parent->name, "..");
+  }
+  // write out to fs
+  memcpy((void*)(inodetable[root_inode_number].data[0]), dir_ptr, BLKSIZE);
+
+  // End of copied from above
+
+
+
+  memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], parent_inode, sizeof(inode_t));
+  memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[first_available_inode_block_index], inodetable, sizeof(inode_t));
+
+  // ..............................................
+
+  // ..............................................
 }
