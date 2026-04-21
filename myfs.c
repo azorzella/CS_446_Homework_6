@@ -371,7 +371,6 @@ Your function should:
 
 #define DEBUG
 
-// IMPLEMENT THIS FUNCTION
 void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname) {
   block_t *imap = malloc(sizeof(block_t));
   memcpy(imap, &(myfs->imap), sizeof(block_t));
@@ -408,7 +407,7 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   memcpy(&myfs->imap, imap, sizeof(block_t));
   free(imap);
   
-  //
+  // ..............................................
 
   block_t *bmap = malloc(sizeof(block_t));
   memcpy(bmap, &(myfs->bmap), sizeof(block_t));
@@ -440,4 +439,14 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   // Write back
   memcpy(&myfs->bmap, bmap, sizeof(block_t));
   free(bmap);
+
+  // ..............................................
+
+  // cur_dir_inode_number is the parent dir inode number
+
+  inode_t* parent_inode = malloc(sizeof(inode_t));
+  memcpy(parent_inode, &myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], sizeof(inode_t));
+  inode_t* new_dir_inode = malloc(sizeof(inode_t));
+  
+  parent_inode->blocks++;
 }
