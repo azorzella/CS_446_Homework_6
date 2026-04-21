@@ -336,14 +336,16 @@ Your function should:
             myfs->imap to the space you malloc’ed in step i).  
         iii) work on the data in Memory, i.e. find the first unused (0) bit, and set it as used (1). 
         iv) write-out to Disk (use memcpy to simulate this using Virtual Memory, i.e. copy from the 
-            space you malloc’ed in step i) to the myfs->imap).  
+            space you malloc’ed in step i) to the myfs->imap).
 2)  Use Read-Modify-Write again. Access the Block Bitmap of the Filesystem and search to find 
     the first location that can be used as a Data Block to store the data of the new inode you are 
-    creating. Then set that bit to indicate this Data Block is now used, and update the Filesystem.   
+    creating. Then set that bit to indicate this Data Block is now used, and update the Filesystem.
 3)  Use Read-Modify-Write again. Access the inode Table of the Filesystem and load the Parent 
-    Directory inode, and the new Directory inode. 
+    Directory inode, and the new Directory inode.
+    
     Modify the Parent Directory inode’s size to indicate that it will now have 1 more Directory 
-    Entry. 
+    Entry.
+    
     Initialize the new Directory inode (size, blocks, data). Use the previously provided code 
     that initialized the Root Directory inode about how to achieve that. Note: Your new 
     Directory is expected to hold 2 Directory Entries at initialization, for ‘.’ and ‘..’. 
@@ -367,19 +369,53 @@ Your function should:
     Finally update the new Directory’s Data Block on the Filesystem.
 */
 
+#define DEBUG
+
 // IMPLEMENT THIS FUNCTION
 void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname) {
   block_t *imap = malloc(sizeof(block_t));
   memcpy(imap, &(myfs->imap), sizeof(block_t));
 
+  printf("\n");
+
   for(uint bit = 0; bit < BLKSIZE; bit++) {
     if(imap->data[bit] == 0) {
-      printf("Found first unused bit at %d\n", bit);
+      #ifdef DEBUG
+      printf("(imap) Found first unused bit at %d\n", bit);
+      #endif
       imap->data[bit] = 1;
       memcpy(&myfs->imap, imap, sizeof(block_t));
       break;
-    }
+    } 
+    // #ifdef DEBUG
+    // else {
+    //   printf("(imap) %d is used, continuing...\n", bit);
+    // }
+    // #endif
   }
 
   free(imap);
+
+  block_t *bmap = malloc(sizeof(block_t));
+  memcpy(bmap, &(myfs->bmap), sizeof(block_t));
+
+  for(uint bit = 0; bit < BLKSIZE; bit++) {
+    if(bmap->data[bit] == 0) {
+      #ifdef DEBUG
+      printf("(bmap) Found first unused bit at %d\n", bit);
+      #endif
+      bmap->data[bit] = 1;
+      memcpy(&myfs->bmap, bmap, sizeof(block_t));
+      break;
+    }
+    // #ifdef DEBUG
+    // else {
+    //   printf("(bmap) %d is used, continuing...\n", bit);
+    // }
+    // #endif
+  }
+
+  free(bmap);
+
+  
 }
