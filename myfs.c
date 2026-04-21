@@ -376,46 +376,68 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   block_t *imap = malloc(sizeof(block_t));
   memcpy(imap, &(myfs->imap), sizeof(block_t));
 
+  #ifdef DEBUG
   printf("\n");
+  #endif
 
-  for(uint bit = 0; bit < BLKSIZE; bit++) {
-    if(imap->data[bit] == 0) {
-      #ifdef DEBUG
-      printf("(imap) Found first unused bit at %d\n", bit);
-      #endif
-      imap->data[bit] = 1;
-      memcpy(&myfs->imap, imap, sizeof(block_t));
+  int first_available_inode_block_index = -1;
+
+  for (size_t byte = 0; byte < BLKSIZE; ++byte) {
+    if(first_available_inode_block_index >= 0) {
       break;
-    } 
-    // #ifdef DEBUG
-    // else {
-    //   printf("(imap) %d is used, continuing...\n", bit);
-    // }
-    // #endif
+    }
+
+    for (uint bit = 0; bit < 8; ++bit) {
+      if ((imap->data[byte] & (0x1 << bit)) == 0) {
+        first_available_inode_block_index = byte*8 + bit;
+        imap->data[byte] |= 0x1 << bit;
+        break;
+      }
+    }
+  }
+  
+  if(first_available_inode_block_index < 0) {
+    printf("No available inode found\n");
+    free(imap);
+    return;
   }
 
+  printf("First available inode found at index %d\n", first_available_inode_block_index);
+
+  // Write back
+  memcpy(&myfs->imap, imap, sizeof(block_t));
   free(imap);
+  
+  //
 
   block_t *bmap = malloc(sizeof(block_t));
   memcpy(bmap, &(myfs->bmap), sizeof(block_t));
 
-  for(uint bit = 0; bit < BLKSIZE; bit++) {
-    if(bmap->data[bit] == 0) {
-      #ifdef DEBUG
-      printf("(bmap) Found first unused bit at %d\n", bit);
-      #endif
-      bmap->data[bit] = 1;
-      memcpy(&myfs->bmap, bmap, sizeof(block_t));
+  int first_available_bnode_block_index = -1;
+
+  for (size_t byte = 0; byte < BLKSIZE; ++byte) {
+    if(first_available_bnode_block_index >= 0) {
       break;
     }
-    // #ifdef DEBUG
-    // else {
-    //   printf("(bmap) %d is used, continuing...\n", bit);
-    // }
-    // #endif
+
+    for (uint bit = 0; bit < 8; ++bit) {
+      if ((bmap->data[byte] & (0x1 << bit)) == 0) {
+        first_available_bnode_block_index = byte*8 + bit;
+        bmap->data[byte] |= 0x1 << bit;
+        break;
+      }
+    }
   }
 
-  free(bmap);
-
+  if(first_available_bnode_block_index < 0) {
+    printf("No available bnode found\n");
+    free(bmap);
+    return;
+  }
   
+  printf("First available bnode found at index %d\n", first_available_bnode_block_index);
+
+  // Write back
+  memcpy(&myfs->bmap, bmap, sizeof(block_t));
+  free(bmap);
 }
