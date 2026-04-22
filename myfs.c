@@ -371,7 +371,8 @@ Your function should:
 
 void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname) {
   // ..............................................
-  //            
+  // Find the first available inode block index
+  // and flag it as used      
   // ..............................................
 
   block_t *imap = malloc(sizeof(block_t));
@@ -399,12 +400,13 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
     return;
   }
 
-  printf("First available inode found at index %d\n", first_available_inode_block_index);
-
   // Write back
   memcpy(&myfs->imap, imap, sizeof(block_t));
   free(imap);
   
+  // ..............................................
+  // Find the first available bmap block index
+  // and flag it as used
   // ..............................................
 
   block_t *bmap = malloc(sizeof(block_t));
@@ -431,13 +433,13 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
     free(bmap);
     return;
   }
-  
-  printf("First available bnode found at index %d\n", first_available_bnode_block_index);
 
   // Write back
   memcpy(&myfs->bmap, bmap, sizeof(block_t));
   free(bmap);
 
+  // ..............................................
+  // Create a new directory
   // ..............................................
 
   // cur_dir_inode_number is the parent dir inode number
@@ -477,8 +479,8 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   dir->file_type = 2;
   dir->inode = first_available_inode_block_index;
   //
-
-// memcpy((void*)(inodetable[root_inode_number].data[0]), dir_ptr, BLKSIZE);
+  
+  // memcpy((void*)(inodetable[root_inode_number].data[0]), dir_ptr, BLKSIZE);
 
   // End of copied from above
 
