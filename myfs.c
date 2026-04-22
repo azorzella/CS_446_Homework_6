@@ -472,7 +472,7 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   dirent_t* root_dirent_self = &dir[0];
   {
   root_dirent_self->name_len = 1;
-  root_dirent_self->inode = root_inode_number;
+  root_dirent_self->inode = first_available_inode_block_index;
   root_dirent_self->file_type = 2;
   strcpy(root_dirent_self->name, ".");
   }
@@ -480,10 +480,18 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   dirent_t* root_dirent_parent = &dir[1];
   {
   root_dirent_parent->name_len = 2;
-  root_dirent_parent->inode = root_inode_number;
+  root_dirent_parent->inode = cur_dir_inode_number;
   root_dirent_parent->file_type = 2;
   strcpy(root_dirent_parent->name, "..");
   }
+  
+  // Where should this go?
+  dir->name_len = strlen(new_dirname);
+  strcpy(dir->name, new_dirname);
+  dir->file_type = 2;
+  dir->inode = first_available_inode_block_index;
+  //
+
   // write out to fs
   memcpy((void*)(inodetable[root_inode_number].data[0]), dir_ptr, BLKSIZE);
 
@@ -494,18 +502,25 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
 
   // ..............................................
 
+
   inode_t* parent_dir_inode = malloc(sizeof(inode_t));
   memcpy(parent_dir_inode, &myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], sizeof(inode_t));
 
   inode_t* parent_dir_data = malloc(sizeof(inode_t));
   memcpy(parent_dir_data, parent_dir_inode->data[0], sizeof(inode_t));
 
-  printf("Foo");
-  
+  for(int i = 0; i < 16; i++) {
+    if(parent_dir_data->data[i] != NULL) {
+      memcpy((void*)parent_dir_data->data[i], dir, BLKSIZE);
+      break;
+    }
+  }
 
-  // ..............................................
+  memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], parent_dir_inode, sizeof(inode_t));
+  memcpy(parent_dir_inode->data[0], parent_dir_data, sizeof(inode_t));
 
-  
   free(parent_inode);
   free(parent_dir_inode);
+
+  // ..............................................
 }
