@@ -503,11 +503,13 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   // ..............................................
 
   inode_t* parent_dir_inode = malloc(sizeof(inode_t));
+  // inode_t* dbg = &myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number];
   memcpy(parent_dir_inode, &myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], sizeof(inode_t));
 
   for(int i = 0; i < 16; i++) {
     block_t* parent_dir_data = parent_dir_inode->data[i];
-    if((dirent_t*)(parent_dir_data) == NULL) {  
+    if((dirent_t*)(parent_dir_data) == NULL) {
+      parent_dir_inode->data[i] = malloc(sizeof(inode_t));
       memcpy(parent_dir_inode->data[i], dir, sizeof(inode_t));
       break;
     }
