@@ -510,7 +510,7 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   memcpy(parent_dir_data, parent_dir_inode->data[0], sizeof(inode_t));
 
   for(int i = 0; i < 16; i++) {
-    if(parent_dir_data->data[i] != NULL) {
+    if(parent_dir_data->data[i] == NULL) {
       memcpy((void*)parent_dir_data->data[i], dir, BLKSIZE);
       break;
     }
