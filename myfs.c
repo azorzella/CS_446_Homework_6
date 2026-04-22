@@ -448,7 +448,7 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   memcpy(parent_inode, &myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], sizeof(inode_t));
   // inode_t* new_dir_inode = malloc(sizeof(inode_t));
   
-  parent_inode->blocks++;
+  parent_inode->size += sizeof(dirent_t);
 
   // Copied from above
 
@@ -479,7 +479,9 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   dir->file_type = 2;
   dir->inode = first_available_inode_block_index;
   //
-  
+
+  // Add the directory to the parent's list of directories here
+
   // memcpy((void*)(inodetable[root_inode_number].data[0]), dir_ptr, BLKSIZE);
 
   // End of copied from above
