@@ -457,7 +457,7 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   // read-in (not required, we are creating filesystem for first time, also zeroed because using calloc)
   dirent_t* dir = (dirent_t*)dir_ptr;
   // dirent '.'
-  dirent_t* root_dirent_self = &dir[1];
+  dirent_t* root_dirent_self = &dir[0];
   {
   root_dirent_self->name_len = 1;
   root_dirent_self->inode = first_available_inode_block_index;
@@ -465,7 +465,7 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   strcpy(root_dirent_self->name, ".");
   }
   // dirent '..'
-  dirent_t* root_dirent_parent = &dir[2];
+  dirent_t* root_dirent_parent = &dir[1];
   {
   root_dirent_parent->name_len = 2;
   root_dirent_parent->inode = cur_dir_inode_number;
