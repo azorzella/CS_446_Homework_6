@@ -487,8 +487,10 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   
   memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], parent_inode, sizeof(inode_t));
   
+  // parent_inode->blocks = 1;
+  // parent_inode->size = sizeof(dirent_t) * 3;
+  
   int num_direntries = parent_inode->size / sizeof(dirent_t);
-
   memcpy(&(((dirent_t*)(parent_inode->data[0]))[num_direntries-1]), dir, sizeof(dirent_t));
 
   printf("Num_direntries: %d\n", num_direntries);
