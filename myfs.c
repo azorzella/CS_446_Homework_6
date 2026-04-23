@@ -105,7 +105,7 @@ int main(int argc, char *argv[]){
 
   // Don't forget to uncomment this:
   // printf("\nDumping filesystem structure:\n");
-  // my_dumpfs(myfs);
+  my_dumpfs(myfs);
 
   printf("\nCrawling filesystem structure:\n");
   my_crawlfs(myfs);
@@ -472,6 +472,8 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   root_dirent_parent->file_type = 2;
   strcpy(root_dirent_parent->name, "..");
   }
+
+  // End of copied from above
   
   // Where should this go?
   dir->name_len = strlen(new_dirname);
@@ -482,11 +484,20 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
 
   // Add the directory to the parent's list of directories here
 
+  // memcpy(parent_inode, dir, sizeof(dirent_t));
   // memcpy((void*)(inodetable[root_inode_number].data[0]), dir_ptr, BLKSIZE);
+  
+  // memcpy(parent_inode->data[0]->data[parent_inode->blocks], dir, sizeof(dirent_t));
 
-  // End of copied from above
+  // memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], dir_ptr, sizeof(dirent_t));
+  int blocks = myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].blocks;
+  myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[blocks] = malloc(sizeof(dirent_t));
+  memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[blocks], dir, sizeof(dirent_t));
 
   memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], parent_inode, sizeof(inode_t));
+
+  // dirent_t* direntries = (dirent_t*)(inodetable[inode_number].data[block_nr]);
+
   // memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[first_available_inode_block_index], inodetable, sizeof(inode_t));
 
   // ..............................................
