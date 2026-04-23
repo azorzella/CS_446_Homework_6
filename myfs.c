@@ -481,9 +481,9 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   //
 
   // Blocks is suspicious here
-  int blocks = myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].blocks;
-  myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[blocks] = malloc(sizeof(dirent_t));
-  memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[blocks], dir, sizeof(dirent_t));
+  // int blocks = myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].blocks;
+  // myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[blocks] = malloc(sizeof(dirent_t));
+  // memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[blocks], dir, sizeof(dirent_t));
   
   memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], parent_inode, sizeof(inode_t));
   
