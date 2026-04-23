@@ -457,7 +457,7 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   // read-in (not required, we are creating filesystem for first time, also zeroed because using calloc)
   dirent_t* dir = (dirent_t*)dir_ptr;
   // dirent '.'
-  dirent_t* root_dirent_self = &dir[0];
+  dirent_t* root_dirent_self = &dir[1];
   {
   root_dirent_self->name_len = 1;
   root_dirent_self->inode = first_available_inode_block_index;
@@ -465,7 +465,7 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   strcpy(root_dirent_self->name, ".");
   }
   // dirent '..'
-  dirent_t* root_dirent_parent = &dir[1];
+  dirent_t* root_dirent_parent = &dir[2];
   {
   root_dirent_parent->name_len = 2;
   root_dirent_parent->inode = cur_dir_inode_number;
@@ -482,28 +482,14 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   dir->inode = first_available_inode_block_index;
   //
 
-  // Add the directory to the parent's list of directories here
-
-  // memcpy(parent_inode, dir, sizeof(dirent_t));
-  // memcpy((void*)(inodetable[root_inode_number].data[0]), dir_ptr, BLKSIZE);
-  
-  // memcpy(parent_inode->data[0]->data[parent_inode->blocks], dir, sizeof(dirent_t));
-
-  // memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], dir_ptr, sizeof(dirent_t));
   int blocks = myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].blocks;
   myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[blocks] = malloc(sizeof(dirent_t));
   memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[blocks], dir, sizeof(dirent_t));
   
   memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], parent_inode, sizeof(inode_t));
   
-  // inode_t* inodetable = myfs->groupdescriptor.groupdescriptor_info.inode_table;
-  // dirent_t* direntries = (dirent_t*)(inodetable[inode_number].data[block_nr]);
-
-  // (dirent_t*)(myfs->groupdescriptor.groupdescriptor_info.inode_table[first_available_inode_block_index].data[first_available_bnode_block_index]);
   int num_direntries = parent_inode->size / sizeof(dirent_t);
-  // dirent_t* entry = (dirent_t*)(myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[0]);
 
-  // (dirent_t*)(parent_inode->data[0])[num_direntries]
   memcpy(&(((dirent_t*)(parent_inode->data[0]))[num_direntries-1]), dir, sizeof(dirent_t));
 
   printf("Num_direntries: %d\n", num_direntries);
@@ -514,44 +500,9 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
     printf("    direntries[%ld].name: %s\n", dirent_num, direntries[dirent_num].name);
     printf("    direntries[%ld].file_type: %s\n", dirent_num, (int)direntries[dirent_num].file_type==2?"folder":(int)direntries[dirent_num].file_type==1?"file":"unknown");
     printf("\n");
-    // if ((int)direntries[dirent_num].file_type == 2) {  // folder type
-    //   if (strcmp(direntries[dirent_num].name,".") && strcmp(direntries[dirent_num].name,"..")) {  // don't dump direntries for slef ('.') and parent ('..'), these are cycles 
-    //     NEXTLEVEL_TAB printf("  inode %d occupied:\n", direntries[dirent_num].inode);
-    //     dump_dirinode(myfs, direntries[dirent_num].inode, level+1);
-    //   }
-    // }
-    // if ((int)direntries[dirent_num].file_type == 1) {  // file type
-    //     LEVEL_TAB printf("    FILE:\n");
-    //     LEVEL_TAB printf("    inode.size: %d\n", inodetable[direntries[dirent_num].inode].size);
-    //     LEVEL_TAB printf("    inode.blocks: %d\n", inodetable[direntries[dirent_num].inode].blocks);
-    //     LEVEL_TAB printf("    inode.data[0]: "); for (int i=0; i<inodetable[direntries[dirent_num].inode].size; ++i) { printf("%c", ((char*)inodetable[direntries[dirent_num].inode].data[0])[i]); } printf("\n"); // only print out block[0] for simplicity
-    // }
   }
 
   printf("\n");
 
-  // memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[first_available_inode_block_index], inodetable, sizeof(inode_t));
-
-  // ..............................................
-
-  // inode_t* parent_dir_inode = malloc(sizeof(inode_t));
-  // // inode_t* dbg = &myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number];
-  // memcpy(parent_dir_inode, &myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], sizeof(inode_t));
-
-  // for(int i = 0; i < 16; i++) {
-  //   block_t* parent_dir_data = parent_dir_inode->data[i];
-  //   if((dirent_t*)(parent_dir_data) == NULL) {
-  //     parent_dir_inode->data[i] = malloc(sizeof(inode_t));
-  //     parent_dir_inode->data[i] = dir;
-  //     // memcpy(parent_dir_inode->data[i], dir, sizeof(inode_t));
-  //     break;
-  //   }
-  // }
-
-  // memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], parent_dir_inode, sizeof(inode_t));
-
   free(parent_inode);
-  // free(parent_dir_inode);
-
-  // ..............................................
 }
