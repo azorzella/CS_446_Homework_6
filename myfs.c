@@ -450,7 +450,7 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   
   parent_inode->size += sizeof(dirent_t);
 
-  // Copied from above
+  // This dir[1] and dir[2] feel off
 
   // data (dir)
   void *dir_ptr = calloc(BLKSIZE, sizeof(char));
@@ -472,8 +472,6 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   root_dirent_parent->file_type = 2;
   strcpy(root_dirent_parent->name, "..");
   }
-
-  // End of copied from above
   
   // Where should this go?
   dir->name_len = strlen(new_dirname);
@@ -482,6 +480,7 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   dir->inode = first_available_inode_block_index;
   //
 
+  // Blocks is suspicious here
   int blocks = myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].blocks;
   myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[blocks] = malloc(sizeof(dirent_t));
   memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[blocks], dir, sizeof(dirent_t));
