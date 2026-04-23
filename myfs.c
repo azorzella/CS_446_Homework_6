@@ -91,17 +91,17 @@ int main(int argc, char *argv[]){
   my_creatdir(myfs, cur_dir_inode_number, "mystuff");  // will be inode 3
   my_creatdir(myfs, cur_dir_inode_number, "homework");  // will be inode 4
   
-  // create 1 dir inside [/homework] dir
-  cur_dir_inode_number = 4;  
-  my_creatdir(myfs, cur_dir_inode_number, "assignment5");  // will be inode 5
+  // // create 1 dir inside [/homework] dir
+  // cur_dir_inode_number = 4;  
+  // my_creatdir(myfs, cur_dir_inode_number, "assignment5");  // will be inode 5
 
-  // create 1 dir inside [/homework/assignment5] dir
-  cur_dir_inode_number = 5; 
-  my_creatdir(myfs, cur_dir_inode_number, "mycode");  // will be inode 6
+  // // create 1 dir inside [/homework/assignment5] dir
+  // cur_dir_inode_number = 5; 
+  // my_creatdir(myfs, cur_dir_inode_number, "mycode");  // will be inode 6
 
-  // create 1 dir inside [/homework/mystuff] dir
-  cur_dir_inode_number = 3;  
-  my_creatdir(myfs, cur_dir_inode_number, "mydata");  // will be inode 7
+  // // create 1 dir inside [/homework/mystuff] dir
+  // cur_dir_inode_number = 3;  
+  // my_creatdir(myfs, cur_dir_inode_number, "mydata");  // will be inode 7
 
   // Don't forget to uncomment this:
   // printf("\nDumping filesystem structure:\n");
@@ -493,10 +493,42 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   int blocks = myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].blocks;
   myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[blocks] = malloc(sizeof(dirent_t));
   memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[blocks], dir, sizeof(dirent_t));
-
+  
   memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], parent_inode, sizeof(inode_t));
-
+  
+  // inode_t* inodetable = myfs->groupdescriptor.groupdescriptor_info.inode_table;
   // dirent_t* direntries = (dirent_t*)(inodetable[inode_number].data[block_nr]);
+
+  // (dirent_t*)(myfs->groupdescriptor.groupdescriptor_info.inode_table[first_available_inode_block_index].data[first_available_bnode_block_index]);
+  int num_direntries = parent_inode->size / sizeof(dirent_t);
+  // dirent_t* entry = (dirent_t*)(myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].data[0]);
+
+  // (dirent_t*)(parent_inode->data[0])[num_direntries]
+  memcpy(&(((dirent_t*)(parent_inode->data[0]))[num_direntries-1]), dir, sizeof(dirent_t));
+
+  printf("Num_direntries: %d\n", num_direntries);
+  dirent_t* direntries = (dirent_t*)(parent_inode->data[0]);
+  for (size_t dirent_num = 0; dirent_num < num_direntries; ++dirent_num) {
+    dirent_t entry = direntries[dirent_num];
+    printf("    direntries[%ld].inode: %d\n", dirent_num, direntries[dirent_num].inode);
+    printf("    direntries[%ld].name: %s\n", dirent_num, direntries[dirent_num].name);
+    printf("    direntries[%ld].file_type: %s\n", dirent_num, (int)direntries[dirent_num].file_type==2?"folder":(int)direntries[dirent_num].file_type==1?"file":"unknown");
+    printf("\n");
+    // if ((int)direntries[dirent_num].file_type == 2) {  // folder type
+    //   if (strcmp(direntries[dirent_num].name,".") && strcmp(direntries[dirent_num].name,"..")) {  // don't dump direntries for slef ('.') and parent ('..'), these are cycles 
+    //     NEXTLEVEL_TAB printf("  inode %d occupied:\n", direntries[dirent_num].inode);
+    //     dump_dirinode(myfs, direntries[dirent_num].inode, level+1);
+    //   }
+    // }
+    // if ((int)direntries[dirent_num].file_type == 1) {  // file type
+    //     LEVEL_TAB printf("    FILE:\n");
+    //     LEVEL_TAB printf("    inode.size: %d\n", inodetable[direntries[dirent_num].inode].size);
+    //     LEVEL_TAB printf("    inode.blocks: %d\n", inodetable[direntries[dirent_num].inode].blocks);
+    //     LEVEL_TAB printf("    inode.data[0]: "); for (int i=0; i<inodetable[direntries[dirent_num].inode].size; ++i) { printf("%c", ((char*)inodetable[direntries[dirent_num].inode].data[0])[i]); } printf("\n"); // only print out block[0] for simplicity
+    // }
+  }
+
+  printf("\n");
 
   // memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[first_available_inode_block_index], inodetable, sizeof(inode_t));
 
