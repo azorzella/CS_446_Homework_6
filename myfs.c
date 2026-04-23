@@ -453,11 +453,11 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   // This dir[1] and dir[2] feel off
 
   // data (dir)
-  void *dir_ptr = calloc(BLKSIZE, sizeof(char));
+  void *dir_contents_ptr = calloc(BLKSIZE, sizeof(char));
   // read-in (not required, we are creating filesystem for first time, also zeroed because using calloc)
-  dirent_t* dir = (dirent_t*)dir_ptr;
+  dirent_t* dir_contents = (dirent_t*)dir_contents_ptr;
   // dirent '.'
-  dirent_t* root_dirent_self = &dir[0];
+  dirent_t* root_dirent_self = &dir_contents[0];
   {
   root_dirent_self->name_len = 1;
   root_dirent_self->inode = first_available_inode_block_index;
@@ -465,20 +465,29 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   strcpy(root_dirent_self->name, ".");
   }
   // dirent '..'
-  dirent_t* root_dirent_parent = &dir[1];
+  dirent_t* root_dirent_parent = &dir_contents[1];
   {
   root_dirent_parent->name_len = 2;
   root_dirent_parent->inode = cur_dir_inode_number;
   root_dirent_parent->file_type = 2;
   strcpy(root_dirent_parent->name, "..");
   }
+
+  void *dir_ptr = calloc(BLKSIZE, sizeof(char));
+  // read-in (not required, we are creating filesystem for first time, also zeroed because using calloc)
+  dirent_t* dir = (dirent_t*)dir_ptr;
   
+  dirent_t* dir_self = &dir[0];
+  {
   // Where should this go?
-  dir->name_len = strlen(new_dirname);
-  strcpy(dir->name, new_dirname);
-  dir->file_type = 2;
-  dir->inode = first_available_inode_block_index;
-  //
+  dir_self->name_len = strlen(new_dirname);
+  strcpy(dir_self->name, new_dirname);
+  dir_self->file_type = 2;
+  dir_self->inode = first_available_inode_block_index;
+  }
+
+  inode_t* dir_inode = (inode_t*)dir;
+  memcpy(dir_inode->data, dir_contents_ptr, sizeof(dirent_t*));
 
   // Blocks is suspicious here
   // int blocks = myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number].blocks;
