@@ -493,17 +493,5 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   int num_direntries = parent_inode->size / sizeof(dirent_t);
   memcpy(&(((dirent_t*)(parent_inode->data[0]))[num_direntries-1]), dir, sizeof(dirent_t));
 
-  printf("Num_direntries: %d\n", num_direntries);
-  dirent_t* direntries = (dirent_t*)(parent_inode->data[0]);
-  for (size_t dirent_num = 0; dirent_num < num_direntries; ++dirent_num) {
-    dirent_t entry = direntries[dirent_num];
-    printf("    direntries[%ld].inode: %d\n", dirent_num, direntries[dirent_num].inode);
-    printf("    direntries[%ld].name: %s\n", dirent_num, direntries[dirent_num].name);
-    printf("    direntries[%ld].file_type: %s\n", dirent_num, (int)direntries[dirent_num].file_type==2?"folder":(int)direntries[dirent_num].file_type==1?"file":"unknown");
-    printf("\n");
-  }
-
-  printf("\n");
-
   free(parent_inode);
 }
