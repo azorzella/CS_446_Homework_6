@@ -513,6 +513,8 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   new_dir_inode->size = sizeof(dirent_t) * 2;
   new_dir_inode->blocks = 1;
   new_dir_inode->data[0] = &(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]);
+  
+  memcpy(&(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]), dir_contents, sizeof(dirent_t) * 2);
 
   memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table, inode_table, sizeof(inode_t) * (first_available_inode_index + 1));
 
