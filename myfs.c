@@ -399,6 +399,7 @@ Your function should:
 
 void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname) {
   // ..............................................
+  // Part 1: Find the First Free inode
   // Find the first available inode block index
   // and flag it as used
   // ..............................................
@@ -433,6 +434,7 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   free(imap);
 
   // ..............................................
+  // Part 2: Find the First Free Block of Memory
   // Find the first available bmap block index
   // and flag it as used
   // ..............................................
@@ -467,6 +469,7 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   free(bmap);
 
   // ..............................................
+  // Part 3: Create a New Directory
   // Create a new directory and add it to the
   // filesystem
   // ..............................................
