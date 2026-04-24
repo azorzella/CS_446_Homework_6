@@ -492,10 +492,14 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   current_dirent_t_in_parent->inode = first_available_inode_index;
   }
 
-  int num_direntries = inode_table[cur_dir_inode_number].size / sizeof(dirent_t);  // get current number of direntries
-  
-  dirent_t* copy_new_dir_to = (dirent_t*)(inode_table[cur_dir_inode_number].data[0]);
-  memcpy(&(copy_new_dir_to[num_direntries - 1]), current_dirent_t_in_parent, sizeof(dirent_t));
+  int parent_inode_num = cur_dir_inode_number;
+  inode_t *parent_inode = &inode_table[parent_inode_num];
+
+  int parent_dir_count = parent_inode->size / sizeof(dirent_t);  // get current number of direntries
+  int new_dir_index = parent_dir_count - 1;
+
+  dirent_t* copy_new_dir_to = (dirent_t*)(parent_inode->data[0]);
+  memcpy(&(copy_new_dir_to[new_dir_index]), current_dirent_t_in_parent, sizeof(dirent_t));
   // ., .. (also has the size of 3)
   // dirent_t* foo = (dirent_t*)(inode_table[cur_dir_inode_number].data[0]);
   // foo[1];
