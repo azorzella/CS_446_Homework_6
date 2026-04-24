@@ -412,23 +412,23 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   block_t *bmap = malloc(sizeof(block_t));
   memcpy(bmap, &(myfs->bmap), sizeof(block_t));
 
-  int first_available_bnode_block_index = -1;
+  int first_available_bnode_index = -1;
 
   for (size_t byte = 0; byte < BLKSIZE; ++byte) {
-    if(first_available_bnode_block_index >= 0) {
+    if(first_available_bnode_index >= 0) {
       break;
     }
 
     for (uint bit = 0; bit < 8; ++bit) {
       if ((bmap->data[byte] & (0x1 << bit)) == 0) {
-        first_available_bnode_block_index = byte*8 + bit;
+        first_available_bnode_index = byte*8 + bit;
         bmap->data[byte] |= 0x1 << bit;
         break;
       }
     }
   }
 
-  if(first_available_bnode_block_index < 0) {
+  if(first_available_bnode_index < 0) {
     printf("No available bnode found\n");
     free(bmap);
     return;
@@ -484,11 +484,12 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   strcpy(root_dirent_parent->name, "..");
   }
 
+  memcpy(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index].data, dir_contents, sizeof(dirent_t));
   //                       &(groupdescriptor->groupdescriptor_info.block_data[root_datablock_number]);
-  new_dir_inode->data[0] = &(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_block_index]);
+  new_dir_inode->data[0] = &(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]);
   // memcpy((void*)(), , BLKSIZE); dir_contents
 
-  memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table, inode_table, sizeof(inode_t));
+  memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table, inode_table, sizeof(inode_t) * (first_available_inode_index + 1));
   
   // dirent_t* dir_self = &dir[0];
   // {
