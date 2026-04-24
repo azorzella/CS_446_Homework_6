@@ -464,9 +464,9 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   parent_dir_inode->size += sizeof(dirent_t);
 
   // data (dir)
-  // void *dir_contents_ptr = calloc(BLKSIZE, sizeof(char));
+  void *dir_contents_ptr = calloc(BLKSIZE, sizeof(char));
   // read-in (not required, we are creating filesystem for first time, also zeroed because using calloc)
-  dirent_t* dir_contents = (dirent_t*)new_dir_inode;
+  dirent_t* dir_contents = (dirent_t*)dir_contents_ptr;
   // dirent '.'
   dirent_t* root_dirent_self = &dir_contents[0];
   {
@@ -512,8 +512,7 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   
   // memcpy((void*)(inodetable[root_inode_number].data[0]), dir_ptr, BLKSIZE);
   
-  memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[cur_dir_inode_number], parent_dir_inode, sizeof(inode_t));
-  memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table[first_available_inode_block_index], new_dir_inode, sizeof(inode_t));
+  memcpy(&myfs->groupdescriptor.groupdescriptor_info.inode_table, inode_table, sizeof(inode_t));
   
   // parent_inode->blocks = 1;
   // parent_inode->size = sizeof(dirent_t) * 3;
