@@ -484,13 +484,15 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   strcpy(root_dirent_parent->name, "..");
   }
 
-  // dirent_t* dir_self = &dir_contents[0];
-  // {
-  // dir_self->name_len = strlen(new_dirname);
-  // strcpy(dir_self->name, new_dirname);
-  // dir_self->file_type = 2;
-  // dir_self->inode = first_available_inode_index;
-  // }
+  dirent_t* current_dirent_t_in_parent = malloc(sizeof(dirent_t));
+  {
+  current_dirent_t_in_parent->name_len = strlen(new_dirname);
+  strcpy(current_dirent_t_in_parent->name, new_dirname);
+  current_dirent_t_in_parent->file_type = 2;
+  current_dirent_t_in_parent->inode = first_available_inode_index;
+  }
+
+  memcpy(&(myfs->groupdescriptor.groupdescriptor_info.inode_table[first_available_inode_index]), current_dirent_t_in_parent, sizeof(dirent_t));
 
   memcpy(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index].data, dir_contents, sizeof(dirent_t) * 2);
   //                       &(groupdescriptor->groupdescriptor_info.block_data[root_datablock_number]);
