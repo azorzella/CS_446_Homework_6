@@ -425,6 +425,9 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   int new_dir_index = parent_dir_count - 1;
   memcpy(&(copy_new_dir_to[new_dir_index]), new_dirent_t, sizeof(dirent_t));
 
+  free(new_dirent_t);
+  free(inode_table);
+
   // ..............................................
   // Part 5: Add . and .. To the New Directory's
   //         Contents
@@ -452,5 +455,5 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
 
   memcpy(&(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]), dir_contents, sizeof(dirent_t) * 2);
 
-  free(inode_table);
+  free(dir_contents_ptr);
 }
