@@ -345,8 +345,6 @@ void my_crawlfs(myfs_t* myfs) {
 void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname) {
   // ..............................................
   // Part 1: Find the First Free inode
-  // Find the first available inode block index
-  // and flag it as used
   // ..............................................
 
   block_t *imap = malloc(sizeof(block_t));
@@ -380,8 +378,6 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
 
   // ..............................................
   // Part 2: Find the First Free Block of Memory
-  // Find the first available bmap block index
-  // and flag it as used
   // ..............................................
 
   block_t *bmap = malloc(sizeof(block_t));
@@ -415,8 +411,6 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
 
   // ..............................................
   // Part 3: Create a New Directory
-  // Create a new directory and add it to the
-  // filesystem
   // ..............................................
 
   // Copy the filesystem's inode table
@@ -437,7 +431,9 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
 
   memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table, inode_table, sizeof(inode_t) * (first_available_inode_index + 1));
   
-  // 4
+  // ..............................................
+  // Part 4: Populate the Directory's Metadata
+  // ..............................................
   int parent_inode_num = cur_dir_inode_number;
   inode_t *parent_inode = &inode_table[parent_inode_num];
   dirent_t* copy_new_dir_to = (dirent_t*)(parent_inode->data[0]);
@@ -457,7 +453,10 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   int new_dir_index = parent_dir_count - 1;
   memcpy(&(copy_new_dir_to[new_dir_index]), new_dirent_t, sizeof(dirent_t));
 
-  // 5
+  // ..............................................
+  // Part 5: Add . and .. To the New Directory's
+  //         Contents
+  // ..............................................
   // As done above, allocate BLKSIZE worth of memory, all zeroed out
   void *dir_contents_ptr = calloc(BLKSIZE, sizeof(char));
   // Cast the region to directory entry
