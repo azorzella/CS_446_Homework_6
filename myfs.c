@@ -91,49 +91,49 @@ int main(int argc, char *argv[]){
   my_creatdir(myfs, cur_dir_inode_number, "mystuff");  // will be inode 3
   my_creatdir(myfs, cur_dir_inode_number, "homework");  // will be inode 4
 
-  // Extensive Test
-  my_creatdir(myfs, cur_dir_inode_number, "socrates");  // will be inode 5
-  my_creatdir(myfs, cur_dir_inode_number, "steam");  // will be inode 6
-  my_creatdir(myfs, cur_dir_inode_number, "linux");  // will be inode 7
+  // // Extensive Test
+  // my_creatdir(myfs, cur_dir_inode_number, "socrates");  // will be inode 5
+  // my_creatdir(myfs, cur_dir_inode_number, "steam");  // will be inode 6
+  // my_creatdir(myfs, cur_dir_inode_number, "linux");  // will be inode 7
 
-  cur_dir_inode_number = 6;
-  my_creatdir(myfs, cur_dir_inode_number, "stephensausage");  // will be inode 8
-  my_creatdir(myfs, cur_dir_inode_number, "baba");  // will be inode 9
-  my_creatdir(myfs, cur_dir_inode_number, "thewitness");  // will be inode 10
+  // cur_dir_inode_number = 6;
+  // my_creatdir(myfs, cur_dir_inode_number, "stephensausage");  // will be inode 8
+  // my_creatdir(myfs, cur_dir_inode_number, "baba");  // will be inode 9
+  // my_creatdir(myfs, cur_dir_inode_number, "thewitness");  // will be inode 10
 
-  cur_dir_inode_number = 8;
-  my_creatdir(myfs, cur_dir_inode_number, "favorites");  // will be inode 11
-  cur_dir_inode_number = 9;
-  my_creatdir(myfs, cur_dir_inode_number, "saves");  // will be inode 12
+  // cur_dir_inode_number = 8;
+  // my_creatdir(myfs, cur_dir_inode_number, "favorites");  // will be inode 11
+  // cur_dir_inode_number = 9;
+  // my_creatdir(myfs, cur_dir_inode_number, "saves");  // will be inode 12
   
-  cur_dir_inode_number = 7;
-  my_creatdir(myfs, cur_dir_inode_number, "debian");  // will be inode 13
-  my_creatdir(myfs, cur_dir_inode_number, "ubuntu");  // will be inode 14
-  my_creatdir(myfs, cur_dir_inode_number, "amogos");  // will be inode 15
-  my_creatdir(myfs, cur_dir_inode_number, "arch");  // will be inode 16
-  my_creatdir(myfs, cur_dir_inode_number, "kubuntu");  // will be inode 17
-  my_creatdir(myfs, cur_dir_inode_number, "mint");  // will be inode 18
+  // cur_dir_inode_number = 7;
+  // my_creatdir(myfs, cur_dir_inode_number, "debian");  // will be inode 13
+  // my_creatdir(myfs, cur_dir_inode_number, "ubuntu");  // will be inode 14
+  // my_creatdir(myfs, cur_dir_inode_number, "amogos");  // will be inode 15
+  // my_creatdir(myfs, cur_dir_inode_number, "arch");  // will be inode 16
+  // my_creatdir(myfs, cur_dir_inode_number, "kubuntu");  // will be inode 17
+  // my_creatdir(myfs, cur_dir_inode_number, "mint");  // will be inode 18
   
-  cur_dir_inode_number = 11;
-  my_creatdir(myfs, cur_dir_inode_number, "tower");  // will be inode 19
-  cur_dir_inode_number = 8;
-  my_creatdir(myfs, cur_dir_inode_number, "saves");  // will be inode 20
+  // cur_dir_inode_number = 11;
+  // my_creatdir(myfs, cur_dir_inode_number, "tower");  // will be inode 19
+  // cur_dir_inode_number = 8;
+  // my_creatdir(myfs, cur_dir_inode_number, "saves");  // will be inode 20
   
-  // // create 1 dir inside [/homework] dir
-  // cur_dir_inode_number = 4;
-  // my_creatdir(myfs, cur_dir_inode_number, "assignment5");  // will be inode 5
+  // create 1 dir inside [/homework] dir
+  cur_dir_inode_number = 4;
+  my_creatdir(myfs, cur_dir_inode_number, "assignment5");  // will be inode 5
 
-  // // create 1 dir inside [/homework/assignment5] dir
-  // cur_dir_inode_number = 5;
-  // my_creatdir(myfs, cur_dir_inode_number, "mycode");  // will be inode 6
+  // create 1 dir inside [/homework/assignment5] dir
+  cur_dir_inode_number = 5;
+  my_creatdir(myfs, cur_dir_inode_number, "mycode");  // will be inode 6
 
-  // // create 1 dir inside [/homework/mystuff] dir
-  // cur_dir_inode_number = 3;
-  // my_creatdir(myfs, cur_dir_inode_number, "mydata");  // will be inode 7
+  // create 1 dir inside [/homework/mystuff] dir
+  cur_dir_inode_number = 3;
+  my_creatdir(myfs, cur_dir_inode_number, "mydata");  // will be inode 7
 
   // Don't forget to uncomment this:
-  printf("\nDumping filesystem structure:\n");
-  my_dumpfs(myfs);
+  // printf("\nDumping filesystem structure:\n");
+  // my_dumpfs(myfs);
 
   printf("\nCrawling filesystem structure:\n");
   my_crawlfs(myfs);
