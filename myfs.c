@@ -342,61 +342,6 @@ void my_crawlfs(myfs_t* myfs) {
   }
 }
 
-/*
-void my_creatdir(myfs_t* myfs,
-                 int cur_dir_inode_number,
-                 const char* new_dirname); 1st param: myfs_t*, Pointer to a Filesystem that was created with my_mkfs().
-2nd param: int, the inode number of the Directory that will be the Parent Directory of the newly
-created one
-3rd param: C-string, the name of the newly created Directory.
-
-Your function should:
-1)  Access the inode Bitmap of the Filesystem and search to find the first location that can be
-    used for the new inode you will create (look above about how to access a specific bit inside a
-    Bitmap array). Then set that bit to indicate this inode is now used, and update the
-    Filesystem.
-    CAUTION: You are not allowed to directly access information on the Filesystem, such as:
-    myfs->imap.data[...]. You have to use the Read-Modify-Write paradigm as an actual
-    Filesystem-implementing code would do, i.e. you have to:
-        i) malloc space in Memory to read-in from Disk (you have to malloc 1 Block) to read 1
-            Block from Disk.
-        ii) read-in from Disk (use memcpy to simulate this using Virtual Memory, i.e. copy from
-            myfs->imap to the space you malloc’ed in step i).
-        iii) work on the data in Memory, i.e. find the first unused (0) bit, and set it as used (1).
-        iv) write-out to Disk (use memcpy to simulate this using Virtual Memory, i.e. copy from the
-            space you malloc’ed in step i) to the myfs->imap).
-2)  Use Read-Modify-Write again. Access the Block Bitmap of the Filesystem and search to find
-    the first location that can be used as a Data Block to store the data of the new inode you are
-    creating. Then set that bit to indicate this Data Block is now used, and update the Filesystem.
-3)  Use Read-Modify-Write again. Access the inode Table of the Filesystem and load the Parent
-    Directory inode, and the new Directory inode.
-
-    Modify the Parent Directory inode’s size to indicate that it will now have 1 more Directory
-    Entry.
-
-    Initialize the new Directory inode (size, blocks, data). Use the previously provided code
-    that initialized the Root Directory inode about how to achieve that. Note: Your new
-    Directory is expected to hold 2 Directory Entries at initialization, for ‘.’ and ‘..’.
-    Then finally update the inode Table on the Filesystem.
-4)  Use Read-Modify-Write again. Access the Parent Directory’s data from the Filesystem. As
-    mentioned, the data will be inside the Data Block location pointed to by the
-    inode.data[0] since this example uses no more that 1 Block.
-    Modify the Parent Directory’s data to append the new Directory Entry you are creating.
-    Follow the example above that does indexing (&dir[0], &dir[1]) after reinterpreting
-    (Pointer-casting) the Block memory to a direntry_t Pointer (i.e. to access the Memory
-    like it has the layout of a direntry_t array). Your code has to be generic, i.e. has to be able
-    to find out how many Directory Entries were in there before, and modify the next one.
-    The new Directory Entry’s inode will be the inode number that you are currently creating,
-    and the name will be the one passed to the function. You are allowed to use strlen() for
-    the name_len.
-    Then finally update the Parent Directory’s data on the Filesystem.
-5)  Use Read-Modify-Write again. Access the new Directory’s data from the Filesystem (the
-    Data Block location you mapped to the new inode’s inode.data[0]in step 4). Load it
-    into Memory and modify it to include 2 Directory Entries for ‘.’ and ‘..’. The example
-    provided above for the Root Filesystem does that exactly.
-    Finally update the new Directory’s Data Block on the Filesystem.
-*/
-
 void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname) {
   // ..............................................
   // Part 1: Find the First Free inode
@@ -474,59 +419,67 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   // filesystem
   // ..............................................
 
+  // Copy the filesystem's inode table
   inode_t* inode_table = malloc(sizeof(inode_t) * (first_available_inode_index + 1));
   memcpy(inode_table, myfs->groupdescriptor.groupdescriptor_info.inode_table, sizeof(inode_t) * (first_available_inode_index));
 
+  // Locally cache the parent and new directory inodes
   inode_t* parent_dir_inode = &inode_table[cur_dir_inode_number];
   inode_t* new_dir_inode = &inode_table[first_available_inode_index];
 
+  // Increase the parent directory's size by the size of a directory
   parent_dir_inode->size += sizeof(dirent_t);
 
-  // data (dir)
-  void *dir_contents_ptr = calloc(BLKSIZE, sizeof(char));
-  // read-in (not required, we are creating filesystem for first time, also zeroed because using calloc)
-  dirent_t* dir_contents = (dirent_t*)dir_contents_ptr;
-  // dirent '.'
-  dirent_t* root_dirent_self = &dir_contents[0];
-  {
-  root_dirent_self->name_len = 1;
-  root_dirent_self->inode = first_available_inode_index;
-  root_dirent_self->file_type = 2;
-  strcpy(root_dirent_self->name, ".");
-  }
-  // dirent '..'
-  dirent_t* root_dirent_parent = &dir_contents[1];
-  {
-  root_dirent_parent->name_len = 2;
-  root_dirent_parent->inode = cur_dir_inode_number;
-  root_dirent_parent->file_type = 2;
-  strcpy(root_dirent_parent->name, "..");
-  }
+  // Initialize the new directory
+  new_dir_inode->size = sizeof(dirent_t) * 2;
+  new_dir_inode->blocks = 1;  
+  new_dir_inode->data[0] = &(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]);
 
-  dirent_t* current_dirent_t_in_parent = malloc(sizeof(dirent_t));
-  {
-  current_dirent_t_in_parent->name_len = strlen(new_dirname);
-  strcpy(current_dirent_t_in_parent->name, new_dirname);
-  current_dirent_t_in_parent->file_type = 2;
-  current_dirent_t_in_parent->inode = first_available_inode_index;
-  }
-
+  memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table, inode_table, sizeof(inode_t) * (first_available_inode_index + 1));
+  
+  // 4
   int parent_inode_num = cur_dir_inode_number;
   inode_t *parent_inode = &inode_table[parent_inode_num];
+  dirent_t* copy_new_dir_to = (dirent_t*)(parent_inode->data[0]);
+  
+  dirent_t* new_dirent_t = malloc(sizeof(dirent_t));
+  {
+    new_dirent_t->name_len = strlen(new_dirname);
+    strcpy(new_dirent_t->name, new_dirname);
+    new_dirent_t->file_type = 2;
+    new_dirent_t->inode = first_available_inode_index;
+  }
+  
+  parent_inode_num = cur_dir_inode_number;
+  parent_inode = &inode_table[parent_inode_num];
 
   int parent_dir_count = parent_inode->size / sizeof(dirent_t);
   int new_dir_index = parent_dir_count - 1;
+  memcpy(&(copy_new_dir_to[new_dir_index]), new_dirent_t, sizeof(dirent_t));
 
-  dirent_t* copy_new_dir_to = (dirent_t*)(parent_inode->data[0]);
-  memcpy(&(copy_new_dir_to[new_dir_index]), current_dirent_t_in_parent, sizeof(dirent_t));
-
-  new_dir_inode->size = sizeof(dirent_t) * 2;
-  new_dir_inode->blocks = 1;
-  new_dir_inode->data[0] = &(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]);
+  // 5
+  // As done above, allocate BLKSIZE worth of memory, all zeroed out
+  void *dir_contents_ptr = calloc(BLKSIZE, sizeof(char));
+  // Cast the region to directory entry
+  dirent_t* dir_contents = (dirent_t*)dir_contents_ptr;
   
-  memcpy(&(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]), dir_contents, sizeof(dirent_t) * 2);
+  dirent_t* self_ref = &dir_contents[0];
+  {
+    self_ref->name_len = 1;
+    self_ref->inode = first_available_inode_index;
+    self_ref->file_type = 2;
+    strcpy(self_ref->name, ".");
+  }
+  
+  dirent_t* parent_ref = &dir_contents[1];
+  {
+    parent_ref->name_len = 2;
+    parent_ref->inode = cur_dir_inode_number;
+    parent_ref->file_type = 2;
+    strcpy(parent_ref->name, "..");
+  }
 
-  memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table, inode_table, sizeof(inode_t) * (first_available_inode_index + 1));
+  memcpy(&(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]), dir_contents, sizeof(dirent_t) * 2);
 
   free(inode_table);
 }
