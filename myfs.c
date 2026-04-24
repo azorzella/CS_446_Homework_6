@@ -388,6 +388,9 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   // Copy the filesystem's inode table
   inode_t* inode_table = malloc(sizeof(inode_t) * (first_available_inode_index + 1));
   memcpy(inode_table, myfs->groupdescriptor.groupdescriptor_info.inode_table, sizeof(inode_t) * (first_available_inode_index));
+  
+  // Cache the free block's address
+  void * free_block_address = &(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]);
 
   // Locally cache the parent and new directory inodes
   inode_t* parent_dir_inode = &inode_table[cur_dir_inode_number];
@@ -398,8 +401,8 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
 
   // Initialize the new directory
   new_dir_inode->size = sizeof(dirent_t) * 2;
-  new_dir_inode->blocks = 1;  
-  new_dir_inode->data[0] = &(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]);
+  new_dir_inode->blocks = 1;
+  new_dir_inode->data[0] = free_block_address;
 
   memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table, inode_table, sizeof(inode_t) * (first_available_inode_index + 1));
   
