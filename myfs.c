@@ -484,21 +484,21 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   strcpy(root_dirent_parent->name, "..");
   }
 
+  // dirent_t* dir_self = &dir_contents[0];
+  // {
+  // dir_self->name_len = strlen(new_dirname);
+  // strcpy(dir_self->name, new_dirname);
+  // dir_self->file_type = 2;
+  // dir_self->inode = first_available_inode_index;
+  // }
+
   memcpy(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index].data, dir_contents, sizeof(dirent_t) * 2);
   //                       &(groupdescriptor->groupdescriptor_info.block_data[root_datablock_number]);
   new_dir_inode->data[0] = &(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]);
   // memcpy((void*)(), , BLKSIZE); dir_contents
-
+  
   memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table, inode_table, sizeof(inode_t) * (first_available_inode_index + 1));
   
-  // dirent_t* dir_self = &dir[0];
-  // {
-  // // Where should this go?
-  // dir_self->name_len = strlen(new_dirname);
-  // strcpy(dir_self->name, new_dirname);
-  // dir_self->file_type = 2;
-  // dir_self->inode = first_available_inode_block_index;
-  // }
 
   free(inode_table);
 
