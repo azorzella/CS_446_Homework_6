@@ -90,6 +90,9 @@ int main(int argc, char *argv[]){
   int cur_dir_inode_number = 2;  // root inode
   my_creatdir(myfs, cur_dir_inode_number, "mystuff");  // will be inode 3
   my_creatdir(myfs, cur_dir_inode_number, "homework");  // will be inode 4
+  my_creatdir(myfs, cur_dir_inode_number, "socrates");  // will be inode 4
+  my_creatdir(myfs, cur_dir_inode_number, "steam");  // will be inode 4
+  my_creatdir(myfs, cur_dir_inode_number, "linux");  // will be inode 4
 
   // // create 1 dir inside [/homework] dir
   // cur_dir_inode_number = 4;
@@ -504,9 +507,16 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   // dirent_t* foo = (dirent_t*)(inode_table[cur_dir_inode_number].data[0]);
   // foo[1];
 
-  memcpy(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index].data, dir_contents, sizeof(dirent_t) * 2);
-  new_dir_inode->data[0] = &(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]);
+  // memcpy(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index].data, dir_contents, sizeof(dirent_t) * 2);
+  // new_dir_inode->data[0] = &(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]);
   // memcpy((void*)(), , BLKSIZE); dir_contents
+
+  int new_dir_inode_index = first_available_inode_index;
+
+  // new_dir_inode->size = sizeof(dirent_t) * 2;
+  // new_dir_inode->blocks = 1;
+  // inode_table[first_available_inode_index].data = malloc(sizeof(block_t) * 15);
+  // memcpy(&new_dir_inode->data, dir_contents, sizeof(dirent_t) * 2);
 
   memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table, inode_table, sizeof(inode_t) * (first_available_inode_index + 1));
 
