@@ -29,7 +29,7 @@ typedef struct _inode_t {
   int size;  // of file in bytes
   int blocks;  // blocks allocated to this file - used or not
   //struct timeval atime;
-  //struct timeval mtime;
+  //struct timeval mtime;  
   struct timeval ctime;  // creation time
   //int links_count;  // hardlinks
   block_t* data[15];  // 12 direct, 1 single-indirect, 1 double-indirect, 1 triple-indirect
@@ -53,7 +53,7 @@ union superblock_t {
 };
 
 typedef struct _groupdescriptor_info_t {
-  inode_t* inode_table;  // location of inode_table (first inode_t in region)
+  inode_t* inode_table;  // location of inode_table (first inode_t in region)  
   block_t* block_data;  // location of block_data (first block_t in region)
 } groupdescriptor_info_t;
 
@@ -81,7 +81,7 @@ int roundup(int x, int y) {
 
 
 int main(int argc, char *argv[]){
-
+    
   inode_t* cur_dir_inode = NULL;
 
   myfs_t* myfs = my_mkfs(100*BLKSIZE, 10);
@@ -90,59 +90,31 @@ int main(int argc, char *argv[]){
   int cur_dir_inode_number = 2;  // root inode
   my_creatdir(myfs, cur_dir_inode_number, "mystuff");  // will be inode 3
   my_creatdir(myfs, cur_dir_inode_number, "homework");  // will be inode 4
-
-  // // Extensive Test
-  // my_creatdir(myfs, cur_dir_inode_number, "socrates");  // will be inode 5
-  // my_creatdir(myfs, cur_dir_inode_number, "steam");  // will be inode 6
-  // my_creatdir(myfs, cur_dir_inode_number, "linux");  // will be inode 7
-
-  // cur_dir_inode_number = 6;
-  // my_creatdir(myfs, cur_dir_inode_number, "stephensausage");  // will be inode 8
-  // my_creatdir(myfs, cur_dir_inode_number, "baba");  // will be inode 9
-  // my_creatdir(myfs, cur_dir_inode_number, "thewitness");  // will be inode 10
-
-  // cur_dir_inode_number = 8;
-  // my_creatdir(myfs, cur_dir_inode_number, "favorites");  // will be inode 11
-  // cur_dir_inode_number = 9;
-  // my_creatdir(myfs, cur_dir_inode_number, "saves");  // will be inode 12
-  
-  // cur_dir_inode_number = 7;
-  // my_creatdir(myfs, cur_dir_inode_number, "debian");  // will be inode 13
-  // my_creatdir(myfs, cur_dir_inode_number, "ubuntu");  // will be inode 14
-  // my_creatdir(myfs, cur_dir_inode_number, "amogos");  // will be inode 15
-  // my_creatdir(myfs, cur_dir_inode_number, "arch");  // will be inode 16
-  // my_creatdir(myfs, cur_dir_inode_number, "kubuntu");  // will be inode 17
-  // my_creatdir(myfs, cur_dir_inode_number, "mint");  // will be inode 18
-  
-  // cur_dir_inode_number = 11;
-  // my_creatdir(myfs, cur_dir_inode_number, "tower");  // will be inode 19
-  // cur_dir_inode_number = 8;
-  // my_creatdir(myfs, cur_dir_inode_number, "saves");  // will be inode 20
   
   // create 1 dir inside [/homework] dir
-  cur_dir_inode_number = 4;
+  cur_dir_inode_number = 4;  
   my_creatdir(myfs, cur_dir_inode_number, "assignment5");  // will be inode 5
 
   // create 1 dir inside [/homework/assignment5] dir
-  cur_dir_inode_number = 5;
+  cur_dir_inode_number = 5; 
   my_creatdir(myfs, cur_dir_inode_number, "mycode");  // will be inode 6
 
   // create 1 dir inside [/homework/mystuff] dir
-  cur_dir_inode_number = 3;
+  cur_dir_inode_number = 3;  
   my_creatdir(myfs, cur_dir_inode_number, "mydata");  // will be inode 7
 
-  // Don't forget to uncomment this:
-  // printf("\nDumping filesystem structure:\n");
-  // my_dumpfs(myfs);
+  printf("\nDumping filesystem structure:\n");
+  my_dumpfs(myfs);
 
   printf("\nCrawling filesystem structure:\n");
   my_crawlfs(myfs);
 
   // destroy filesystem
   free(myfs);
-
+  
   return 0;
 }
+
 
 myfs_t* my_mkfs(int size, int maxfiles) {
   int num_data_blocks = roundup(size, BLKSIZE);
@@ -150,7 +122,7 @@ myfs_t* my_mkfs(int size, int maxfiles) {
   int num_inode_table_blocks = roundup(maxfiles*sizeof(inode_t), BLKSIZE);  // Note: not quite, inode should
                                                                             // not be split between blocks
 
-  size_t fs_size = sizeof(myfs_t) +  // superblock_t + groupdescriptor_t + block bitmap + inode bitmap
+  size_t fs_size = sizeof(myfs_t) +  // superblock_t + groupdescriptor_t + block bitmap + inode bitmap 
                    num_inode_table_blocks * sizeof(block_t) +  // inode_table
                    num_data_blocks * sizeof(block_t);  // data_blocks
 
@@ -187,9 +159,9 @@ myfs_t* my_mkfs(int size, int maxfiles) {
   void *groupdescriptor_ptr = calloc(BLKSIZE, sizeof(char));
   // read-in (not required, we are creating filesystem for first time, also zeroed because using calloc)
   union groupdescriptor_t* groupdescriptor = (union groupdescriptor_t*)groupdescriptor_ptr;
-  groupdescriptor->groupdescriptor_info.inode_table = (inode_t*)((char*)ptr +
+  groupdescriptor->groupdescriptor_info.inode_table = (inode_t*)((char*)ptr + 
                                                                  sizeof(myfs_t));
-  groupdescriptor->groupdescriptor_info.block_data = (block_t*)((char*)ptr +
+  groupdescriptor->groupdescriptor_info.block_data = (block_t*)((char*)ptr + 
                                                                 sizeof(myfs_t) +
                                                                 num_inode_table_blocks * sizeof(block_t));
   // write out to fs
@@ -202,10 +174,10 @@ myfs_t* my_mkfs(int size, int maxfiles) {
   // read-in (not required, we are creating filesystem for first time, also zeroed because using calloc)
   inode_t* inodetable = (inode_t*)inodetable_ptr;
   inodetable[root_inode_number].size = 2 * sizeof(dirent_t);  // will contain 2 direntries ('.' and '..') at initialization
-  inodetable[root_inode_number].blocks = 1;  // will only take up 1 block (for just 2 direntries: '.' and '..') at initialization
+  inodetable[root_inode_number].blocks = 1;  // will only take up 1 block (for just 2 direntries: '.' and '..') at initialization 
   for (uint i=1; i<15; ++i)  // initialize all data blocks to NULL (1 data block only needed at initialization)
     inodetable[root_inode_number].data[i] = NULL;
-  inodetable[root_inode_number].data[0] = &(groupdescriptor->groupdescriptor_info.block_data[root_datablock_number]);
+  inodetable[root_inode_number].data[0] = &(groupdescriptor->groupdescriptor_info.block_data[root_datablock_number]);  
   // write out to fs
   memcpy((void*)groupdescriptor->groupdescriptor_info.inode_table, inodetable_ptr, BLKSIZE);
 
@@ -290,7 +262,7 @@ void dump_dirinode(myfs_t* myfs, int inode_number, int level) {
         LEVEL_TAB printf("    direntries[%ld].name: %s\n", dirent_num, direntries[dirent_num].name);
         LEVEL_TAB printf("    direntries[%ld].file_type: %s\n", dirent_num, (int)direntries[dirent_num].file_type==2?"folder":(int)direntries[dirent_num].file_type==1?"file":"unknown");
         if ((int)direntries[dirent_num].file_type == 2) {  // folder type
-          if (strcmp(direntries[dirent_num].name,".") && strcmp(direntries[dirent_num].name,"..")) {  // don't dump direntries for slef ('.') and parent ('..'), these are cycles
+          if (strcmp(direntries[dirent_num].name,".") && strcmp(direntries[dirent_num].name,"..")) {  // don't dump direntries for slef ('.') and parent ('..'), these are cycles 
             NEXTLEVEL_TAB printf("  inode %d occupied:\n", direntries[dirent_num].inode);
             dump_dirinode(myfs, direntries[dirent_num].inode, level+1);
           }
@@ -316,7 +288,7 @@ void crawl_dirinode(myfs_t* myfs, int inode_number, int level) {
       for (size_t dirent_num = 0; dirent_num < num_direntries; ++dirent_num) {
         LEVEL_TREE printf("_ %s\n", direntries[dirent_num].name);
         if ((int)direntries[dirent_num].file_type == 2) {  // folder type
-          if (strcmp(direntries[dirent_num].name,".") && strcmp(direntries[dirent_num].name,"..")) {  // don't dump direntries for slef ('.') and parent ('..'), these are cycles
+          if (strcmp(direntries[dirent_num].name,".") && strcmp(direntries[dirent_num].name,"..")) {  // don't dump direntries for slef ('.') and parent ('..'), these are cycles 
             crawl_dirinode(myfs, direntries[dirent_num].inode, level+1);
           }
         }
