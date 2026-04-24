@@ -460,21 +460,9 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   free(bmap);
 
   // ..............................................
-  // 3: Create a new directory
+  // Create a new directory and add it to the
+  // filesystem
   // ..............................................
-
-  /*
-    Use Read-Modify-Write again. Access the inode Table of the Filesystem and load the Parent
-    Directory inode, and the new Directory inode.
-
-    Modify the Parent Directory inode’s size to indicate that it will now have 1 more Directory
-    Entry.
-
-    Initialize the new Directory inode (size, blocks, data). Use the previously provided code
-    that initialized the Root Directory inode about how to achieve that. Note: Your new
-    Directory is expected to hold 2 Directory Entries at initialization, for ‘.’ and ‘..’.
-    Then finally update the inode Table on the Filesystem.
-  */
 
   inode_t* inode_table = malloc(sizeof(inode_t) * (first_available_inode_index + 1));
   memcpy(inode_table, myfs->groupdescriptor.groupdescriptor_info.inode_table, sizeof(inode_t) * (first_available_inode_index));
@@ -516,57 +504,19 @@ void my_creatdir(myfs_t* myfs, int cur_dir_inode_number, const char* new_dirname
   int parent_inode_num = cur_dir_inode_number;
   inode_t *parent_inode = &inode_table[parent_inode_num];
 
-  int parent_dir_count = parent_inode->size / sizeof(dirent_t);  // get current number of direntries
+  int parent_dir_count = parent_inode->size / sizeof(dirent_t);
   int new_dir_index = parent_dir_count - 1;
 
   dirent_t* copy_new_dir_to = (dirent_t*)(parent_inode->data[0]);
   memcpy(&(copy_new_dir_to[new_dir_index]), current_dirent_t_in_parent, sizeof(dirent_t));
-  // ., .. (also has the size of 3)
-  // dirent_t* foo = (dirent_t*)(inode_table[cur_dir_inode_number].data[0]);
-  // foo[1];
-
-  // memcpy(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index].data, dir_contents, sizeof(dirent_t) * 2);
-  // new_dir_inode->data[0] = &(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]);
-  // memcpy((void*)(), , BLKSIZE); dir_contents
 
   int new_dir_inode_index = first_available_inode_index;
 
   new_dir_inode->size = sizeof(dirent_t) * 2;
   new_dir_inode->blocks = 1;
-
-  // inode_table[first_available_inode_index].data = malloc(sizeof(block_t) * 15);
-  // memcpy(&new_dir_inode->data, dir_contents, sizeof(dirent_t) * 2);
-
-  // inodetable[root_inode_number].data[0] = &(groupdescriptor->groupdescriptor_info.block_data[root_datablock_number]);
   new_dir_inode->data[0] = &(myfs->groupdescriptor.groupdescriptor_info.block_data[first_available_bnode_index]);
 
   memcpy(myfs->groupdescriptor.groupdescriptor_info.inode_table, inode_table, sizeof(inode_t) * (first_available_inode_index + 1));
 
-  // int num_direntries = inode_table[cur_dir_inode_number].size / sizeof(dirent_t);  // get current number of direntries
-  // dirent_t* direntries = (dirent_t*)(inode_table[cur_dir_inode_number].data[num_direntries]);
-  // inode_t* inodetable = myfs->groupdescriptor.groupdescriptor_info.inode_table;
-
   free(inode_table);
-
-   /*
-    Use Read-Modify-Write again. Access the Parent Directory’s data from the Filesystem. As
-    mentioned, the data will be inside the Data Block location pointed to by the
-    inode.data[0] since this example uses no more that 1 Block.
-    Modify the Parent Directory’s data to append the new Directory Entry you are creating.
-    Follow the example above that does indexing (&dir[0], &dir[1]) after reinterpreting
-    (Pointer-casting) the Block memory to a direntry_t Pointer (i.e. to access the Memory
-    like it has the layout of a direntry_t array). Your code has to be generic, i.e. has to be able
-    to find out how many Directory Entries were in there before, and modify the next one.
-    The new Directory Entry’s inode will be the inode number that you are currently creating,
-    and the name will be the one passed to the function. You are allowed to use strlen() for
-    the name_len.
-  */
-
-  /*
-    Use Read-Modify-Write again. Access the new Directory’s data from the Filesystem (the
-    Data Block location you mapped to the new inode’s inode.data[0]in step 4). Load it
-    into Memory and modify it to include 2 Directory Entries for ‘.’ and ‘..’. The example
-    provided above for the Root Filesystem does that exactly.
-    Finally update the new Directory’s Data Block on the Filesystem.
-  */
 }
